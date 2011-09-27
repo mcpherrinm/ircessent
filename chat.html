@@ -1,19 +1,17 @@
 <!doctype html>
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
-<!--
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
 
  var socket = io.connect('http://corn-syrup.csclub.uwaterloo.ca:9000');
  socket.on('statuschange', function(data) {
-  console.log(data);
-  socket.emit('statusack', {my: 'GOTCHA'});
+  console.log("New status" + data);
+  socket.emit('statusack', {my: 'GOTCHA' + data});
  });
 
 </script>
--->
 
 <script>
 
@@ -45,11 +43,12 @@ var handleinput = function(line) {
   }
   var fill = document.getElementById('fill');
   // otherwise it's a message
-  socket.emit('message', line);
-  // I should do this async after send succeeds (along with re-activating input):
-  $('#chat').append("<p>" + line + "  sH " + fill.scrollHeight + " H" + $(fill).height() +"</p>");
-  $(fill).scrollTop(fill.scrollHeight - $(fill).height());
+  socket.emit("message", line);
  }
+}
+
+var scrolldown = function(fill) {
+  $(fill).scrollTop(fill.scrollHeight - $(fill).height());
 }
 
 var newmessage = function(message) {
@@ -57,9 +56,14 @@ var newmessage = function(message) {
   var bottom = atbottom(fill);
   $('#chat').append("<p>" + message + "</p>");
   if(bottom) {
-    $(fill).scrollTop(fill.scrollHeight - $(fill).height());
+    scrolldown(fill);
   }
 }
+
+socket.on('message', function(data) {
+  newmessage(data);
+  scrolldown($('#fill'));
+});
 </script>
 
 <style>

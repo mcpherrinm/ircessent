@@ -22,4 +22,8 @@ io.sockets.on('connection', function(socket) {
   console.log(data);
   socket.emit('message', 'yo ho-ho');
  });
+ socket.on('message', function(data) {
+   console.log("user messaged " + data);
+   socket.emit('message', (new Date()).toLocaleTimeString() +" <you> " + data);
+ });
 });
