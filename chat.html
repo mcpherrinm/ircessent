@@ -1,0 +1,96 @@
+<!doctype html>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<!--
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+ var socket = io.connect('http://corn-syrup.csclub.uwaterloo.ca:9000');
+ socket.on('statuschange', function(data) {
+  console.log(data);
+  socket.emit('statusack', {my: 'GOTCHA'});
+ });
+
+</script>
+-->
+
+<script>
+
+var resize = function() {
+ var calc = $(document.body).height() - $('#top').height() - $('#input').height();
+ console.log("Set height to " + calc + $("#input").height());
+ $('#fill').height(calc);
+}
+
+$(resize);
+$(window).resize(resize);
+
+var handleinput = function(line) {
+ console.log(line);
+ if(line != "") {
+  if(line[0] == "/") {
+   console.log("command:" + line);
+  }
+  $('#chat').append("<p>" + line + "</p>");
+ }
+}
+</script>
+
+<style>
+  * {
+    margin: 0;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  div#fill {
+    overflow-y: scroll;
+    margin-bottom: 3em;
+    width: 100%;
+    background-color: lightgreen;
+  }
+
+  div#chat {
+    border: 1px solid blue;
+    padding: 4px;
+  }
+
+  input#input {
+    position: absolute;
+    bottom: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height:3em;
+    background-color: red;
+    width: 100%;
+  }
+</style>
+
+<div id=top>
+<p>Yo, title.</p>
+</div>
+
+<div id=fill>
+ <div id=chat>
+ <p> backlog</p>
+ </div>
+</div>
+
+<input type=text id=input>
+
+<script>
+$('#input').keydown(function(event) {
+	if(event.keyCode == "13") {
+		event.preventDefault();
+		handleinput( $(this).val() );
+		/* TODO: Grey out, let async handler re-enable when event processed */
+		$(this).val("");
+	}
+});
+</script>
