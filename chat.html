@@ -5,19 +5,12 @@
 
 <script>
 
- var socket = io.connect('http://corn-syrup.csclub.uwaterloo.ca:9000');
- socket.on('statuschange', function(data) {
-  console.log("New status" + data);
-  socket.emit('statusack', {my: 'GOTCHA' + data});
- });
-
-</script>
-
-<script>
-
+/* Defs */
 var resize = function() {
- var calc = $(document.body).height() - $('#top').height() - $('#input').height();
- console.log("Set height to " + calc + $("#input").height());
+  // Todo: Allow multiple containers, use better selectors -- for tabs, side user widget, etc.
+  // Idea: #fill is #container minus height of siblings
+  // Fill should be child of container.
+ var calc = $('#container').height() - $('#top').height() - $('#input').height();
  $('#fill').height(calc);
 }
 
@@ -30,11 +23,10 @@ var atbottom = function(fill) {
   return (fill.scrollTop > offset - 15); //tolerence is magic number
 }
 
-$(resize);
-$(window).resize(resize);
-
 var handleinput = function(line) {
  console.log(line);
+ var fill = document.getElementById('fill');
+ scrolldown(fill); // always scroll on input, even blank?
  if(line != "") {
   if(line[0] == "/") {
    console.log("command:" + line);
@@ -60,9 +52,31 @@ var newmessage = function(message) {
   }
 }
 
-socket.on('message', function(data) {
-  newmessage(data);
-  scrolldown($('#fill'));
+/* Run before dom ready: */
+
+var socket = io.connect('http://corn-syrup.csclub.uwaterloo.ca:9000');
+socket.on('statuschange', function(data) {
+ console.log("New status" + data);
+ socket.emit('statusack', {my: 'GOTCHA' + data});
+});
+
+socket.on('message', newmessage);
+
+/* Once dom is loaded: */
+$(document).ready(function() {
+
+ resize();
+ $(window).resize(resize);
+
+ $('#input').keydown(function(event) {
+   if(event.keyCode == "13") {
+     event.preventDefault();
+     handleinput( $(this).val() );
+     /* TODO: Grey out, let async handler re-enable when event processed */
+     $(this).val("");
+   }
+});
+
 });
 </script>
 
@@ -101,6 +115,7 @@ socket.on('message', function(data) {
   }
 </style>
 
+<div id=container>
 <div id=top>
 <p>Yo, title.</p>
 </div>
@@ -112,14 +127,4 @@ socket.on('message', function(data) {
 </div>
 
 <input type=text id=input>
-
-<script>
-$('#input').keydown(function(event) {
-	if(event.keyCode == "13") {
-		event.preventDefault();
-		handleinput( $(this).val() );
-		/* TODO: Grey out, let async handler re-enable when event processed */
-		$(this).val("");
-	}
-});
-</script>
+</div>
