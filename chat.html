@@ -23,6 +23,15 @@ var resize = function() {
  $('#fill').height(calc);
 }
 
+var atbottom = function(fill) {
+  var height = $(fill).height();
+  var scrollHeight = fill.scrollHeight;
+  var scrollTop = fill.scrollTop;
+  var offset = scrollHeight - height;
+  // allow a tolerence for scrolled to bottom
+  return (fill.scrollTop > offset - 15); //tolerence is magic number
+}
+
 $(resize);
 $(window).resize(resize);
 
@@ -31,9 +40,25 @@ var handleinput = function(line) {
  if(line != "") {
   if(line[0] == "/") {
    console.log("command:" + line);
+   // handle locally, if not send to server
+   socket.emit('command', line);
   }
-  $('#chat').append("<p>" + line + "</p>");
+  var fill = document.getElementById('fill');
+  // otherwise it's a message
+  socket.emit('message', line);
+  // I should do this async after send succeeds (along with re-activating input):
+  $('#chat').append("<p>" + line + "  sH " + fill.scrollHeight + " H" + $(fill).height() +"</p>");
+  $(fill).scrollTop(fill.scrollHeight - $(fill).height());
  }
+}
+
+var newmessage = function(message) {
+  var fill = document.getElementById('fill');
+  var bottom = atbottom(fill);
+  $('#chat').append("<p>" + message + "</p>");
+  if(bottom) {
+    $(fill).scrollTop(fill.scrollHeight - $(fill).height());
+  }
 }
 </script>
 

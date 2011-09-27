@@ -20,5 +20,6 @@ io.sockets.on('connection', function(socket) {
  socket.emit('statuschange', { status: 'START' });
  socket.on('statusack', function(data) {
   console.log(data);
+  socket.emit('message', 'yo ho-ho');
  });
 });
