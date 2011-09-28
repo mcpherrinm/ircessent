@@ -1,6 +1,7 @@
 var app = require('http').createServer(handler)
  , io = require('socket.io').listen(app)
  , fs = require('fs')
+ , ent = require('ent')
 
 app.listen(9000);
 
@@ -24,6 +25,6 @@ io.sockets.on('connection', function(socket) {
  });
  socket.on('message', function(data) {
    console.log("user messaged " + data);
-   socket.emit('message', (new Date()).toLocaleTimeString() +" <you> " + data);
+   socket.emit('message', ent.encode( (new Date()).toLocaleTimeString() +" <you> " + data));
  });
 });
