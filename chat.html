@@ -10,7 +10,7 @@ var resize = function() {
   // Todo: Allow multiple containers, use better selectors -- for tabs, side user widget, etc.
   // Idea: #fill is #container minus height of siblings
   // Fill should be child of container.
- var calc = $('#container').height() - $('#top').height() - $('#input').height();
+ var calc = $(window).height() - $('#top').height() - $('#bottom').height();
  $('#fill').height(calc);
 }
 
@@ -32,10 +32,11 @@ var handleinput = function(line) {
    console.log("command:" + line);
    // handle locally, if not send to server
    socket.emit('command', line);
+  } else {
+   var fill = document.getElementById('fill');
+   // otherwise it's a message
+   socket.emit("message", line);
   }
-  var fill = document.getElementById('fill');
-  // otherwise it's a message
-  socket.emit("message", line);
  }
 }
 
@@ -61,6 +62,9 @@ socket.on('statuschange', function(data) {
 });
 
 socket.on('message', newmessage);
+socket.on('nickchange', function(nick) { $('#nick').text(nick); });
+socket.on('topicchange', function(topic) { console.log("Topic: " + topic ); $('#topic').text(topic); });
+socket.on('error', function(thing) { newmessage('you cocksucker, you made an error: ' + thing); });
 
 /* Once dom is loaded: */
 $(document).ready(function() {
@@ -68,7 +72,7 @@ $(document).ready(function() {
  resize();
  $(window).resize(resize);
 
- $('#input').keydown(function(event) {
+ $('#cmdline').keydown(function(event) {
    if(event.keyCode == "13") {
      event.preventDefault();
      handleinput( $(this).val() );
@@ -88,43 +92,57 @@ $(document).ready(function() {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: hidden; 
+  }
+
+  #top, #bottom {
+    background: #eee;
   }
 
   div#fill {
     overflow-y: scroll;
-    margin-bottom: 3em;
     width: 100%;
-    background-color: lightgreen;
   }
 
   div#chat {
-    border: 1px solid blue;
     padding: 4px;
   }
 
-  input#input {
-    position: absolute;
-    bottom: 0;
-    margin: 0;
+  #bottom {
     padding: 0;
     border: 0;
-    height:3em;
-    background-color: red;
+    width: 100%;
+    display: -moz-box;
+    -moz-box-orient: horizontal;
+    -moz-box-align: center;
+  }
+
+  #input {
+    -moz-box-flex: 1;
+  }
+
+  #input > input {
     width: 100%;
   }
 </style>
 
 <div id=container>
-<div id=top>
-<p>Yo, title.</p>
-</div>
-
-<div id=fill>
- <div id=chat>
- <p> backlog</p>
+ <div id=top>
+  <p id=topic>{{topic}}</p>
  </div>
-</div>
 
-<input type=text id=input>
+ <div id=fill>
+  <div id=chat>
+   {% for ii in backlog %}
+   <p>{{ii}}</p>
+   {% endfor %}
+  </div>
+ </div>
+
+<div id=bottom>
+  <div id=nickbox>[ <span id=nick>{{nick}}</span> ] </div>
+  <div id=input>
+    <input type=text id=cmdline>
+  </div>
+  </div>
 </div>
