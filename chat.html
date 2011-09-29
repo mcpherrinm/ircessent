@@ -1,15 +1,14 @@
 <!doctype html>
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://browserid.org/include.js" type="text/javascript"></script>
 <script src="/socket.io/socket.io.js"></script>
 
 <script>
 
 /* Defs */
 var resize = function() {
-  // Todo: Allow multiple containers, use better selectors -- for tabs, side user widget, etc.
-  // Idea: #fill is #container minus height of siblings
-  // Fill should be child of container.
+  // Todo: #fill is parent height minus height of siblings
  var calc = $(window).height() - $('#top').height() - $('#bottom').height();
  $('#fill').height(calc);
 }

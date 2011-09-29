@@ -23,36 +23,59 @@ function handler(req, res) {
    }
    res.writeHead(200); 
    /* Todo: Render data into initial page for non-JS / static / backlog use */
+   /* Put listener onto IRC to start getting bits popped into the socket */
    res.end(data);
   });
 }
 
 // Format a message for user display
-function line(sock, date, source, unsafeMessage) {
-  sock.emit('message', ent.encode( date.toLocaleTimeString() + " <" + source + "> " + unsafeMessage));
+function line(sock, date, source, message) {
+  sock.emit('message', ent.encode( date.toLocaleTimeString() + " <" + source + "> " + message));
 }
 
 io.sockets.on('connection', function(socket) {
- sessions['mimcpher']['socket'] = socket;
+ var user = 'mimcpher'; // todo: Verify :P
+ sessions[user]['socket'] = socket;
  socket.emit('statuschange', { status: 'START' });
  socket.on('statusack', function(data) {
   console.log('Status ackd, client synced and ready to go.');
-  socket.emit('nickchange', sessions['mimcpher']['nick']);
+  socket.emit('nickchange', sessions[user]['nick']);
  });
- socket.on('message', function(unsafeData) {
-   line(socket, new Date(), sessions['mimcpher']['nick'], unsafeData);
+ socket.on('message', function(data) {
+   line(socket, new Date(), sessions[user]['nick'], data);
+   var channel = "#herptest";
+   sessions[user]['irc'].say(channel, data);
  });
- socket.on('command', function(unsafeData) {
-   unsafesplit = unsafeData.match(/^\/(\w+)(.*)/);
-   command = unsafesplit[1]; //safety: \w+ from regex
+ socket.on('command', function(data) {
+   split = data.match(/^\/(\w+)(.*)/);
+   command = split[1]; //safety: \w+ from regex
    // 0 is whole thing, 1 is command, 2 is remainder
    switch(command) {
      case "nick":
-       sessions['mimcpher']['nick'] = unsafesplit[2].match(/\w+/)[0];
-       socket.emit('nickchange', sessions['mimcpher']['nick']);
+       sessions[user]['nick'] = split[2].match(/\w+/)[0];
+       socket.emit('nickchange', sessions[user]['nick']);
        break;
      case "topic":
-       socket.emit('topicchange', unsafesplit[2]);
+       var topic = split[2];
+       if(topic != "") {
+         socket.emit('topicchange', topic);
+       }
+       break;
+     case "connect":
+       var host = 'irc.freenode.net';
+       var client = new irc.Client(host, sessions[user]['nick']);
+       sessions[user]['irc'] = client;
+       console.log("connecting....");
+       client.addListener('message', function(from, to, message) {
+         line(sessions[user]['socket'], new Date(), from, message);
+       });
+       client.addListener('topic', function (channel, topic, nick) { socket.emit('topicchange', topic); });
+       break;
+     case "join":
+       var channel = "#herptest";
+       sessions[user]['irc'].join(channel);
+       console.log('Joining ' + channel);
+       line(socket, new Date(), channel, "Joining...");
        break;
      default:
        socket.emit('error', {'invalidCommand': command});
