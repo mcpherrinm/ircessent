@@ -3,30 +3,61 @@ var app = require('http').createServer(handler)
  , fs = require('fs')
  , ent = require('ent')
  , irc = require('irc')
+ , CAS = require('cas')
 
+pageurl = 'http://corn-syrup.csclub.uwaterloo.ca:9000/'
+
+cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: pageurl});
 app.listen(9000);
 
 sessions = {
   'mimcpher': {
     'nick': 'mimcpher',
     'socket': null,
-    'irc': [],
+    'irc': null,
   },
   };
 
-function handler(req, res) {
- fs.readFile(__dirname + "/chat.html",
-  function(err, data) {
-   if(err) {
-    res.writeHead(500);
-    return res.end('Error');
-   }
-   res.writeHead(200); 
-   /* Todo: Render data into initial page for non-JS / static / backlog use */
-   /* Put listener onto IRC to start getting bits popped into the socket */
-   res.end(data);
-  });
+function servechat(req, res) {
+   fs.readFile(__dirname + "/chat.html",
+    function(err, data) {
+     if(err) {
+      res.writeHead(500);
+      return res.end('Error');
+     }
+     res.writeHead(200); 
+     /* Todo: Render data into initial page for non-JS / static / backlog use */
+     /* Put listener onto IRC to start getting bits popped into the socket */
+     res.end(data);
+    });
 }
+
+function handler(req, res) {
+  console.log(req.url);
+  console.log(req.headers);
+  var logged_in = false; // todo, cookie?
+  if(!logged_in) {
+    var parsed = require('url').parse(req.url, true);
+    console.log(parsed);
+    var ticket = parsed['query']['ticket'];
+    if(ticket) {
+      cas.validate(ticket, function(err, status, username) {
+        if(err) {
+          res.writeHead(403); res.end("fuckoff"); 
+        } else {
+          servechat(req, res);
+        }
+      });
+    } else {
+      // No ticket and logged out:
+      res.writeHead(302, {'Location': "https://cas.uwaterloo.ca/cas/login?service=" + pageurl});
+      res.end("Redirecting");
+    }
+  } else {
+    servechat(req, res);
+  }
+}
+
 
 // Format a message for user display
 function line(sock, date, source, message) {
@@ -38,7 +69,10 @@ io.sockets.on('connection', function(socket) {
  sessions[user]['socket'] = socket;
  socket.emit('statuschange', { status: 'START' });
  socket.on('statusack', function(data) {
-  console.log('Status ackd, client synced and ready to go.');
+  console.log("got ack");
+ });
+ socket.on('ready', function(data) {
+  console.log('client ready');
   socket.emit('nickchange', sessions[user]['nick']);
  });
  socket.on('message', function(data) {

@@ -32,7 +32,6 @@ var handleinput = function(line) {
    // handle locally, if not send to server
    socket.emit('command', line);
   } else {
-   var fill = document.getElementById('fill');
    // otherwise it's a message
    socket.emit("message", line);
   }
@@ -78,6 +77,7 @@ $(document).ready(function() {
      /* TODO: Grey out, let async handler re-enable when event processed */
      $(this).val("");
    }
+ socket.emit('ready', 'dom');
 });
 
 });
