@@ -1,0 +1,15 @@
+.box {
+ display: -moz-box;
+
+ -moz-box-orient: vertical;
+}
+
+.hbox {
+ display: -moz-box;
+
+ -moz-box-orient: horizontal;
+}
+
+.flex {
+ -moz-box-flex: 1;
+}
