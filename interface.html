@@ -1,8 +1,18 @@
 <!doctype html>
 
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
 <style>
 html, body, body > div { height: 100%; width: 100%; }
 * { margin: 0;}
+#content > div.flex > div.box {
+overflow-y: scroll;
+}
+
+#sidebar {
+ width: 10em;
+}
 </style>
 
 <link href="boxclasses.css" rel="stylesheet" type="text/css">
@@ -10,16 +20,30 @@ html, body, body > div { height: 100%; width: 100%; }
 
 <div class=box id=contains>
  <div class=hbox id=tabs>
-  <div class=tab>Tab 1</div>
-  <div id=activetab class=tab>Tab 2</div>
-  <div class=tab>Tab 3</div>
-  <div class=tab>Tab 4</div>
+  <div class=tab><a href="">Tab 1</a></div>
+  <div id=activetab class=tab><a href="">Tab 2</a></div>
+  <div class=tab><a href="">Tab 3</a></div>
+  <div class=tab><a href="">Tab 4</a></div>
  </div>
  <div id=content class="flex box">
-  <div id=topic> Welcome to ho-ho-land</div>
-  <div class=flex>
-   Content
+  <div id=topic>{{ topic }}</div>
+  <div class="hbox flex">
+   <div class="box flex endpack">
+    <p>Content</p>
+    <p>Content</p>
+    <p>Content</p>
+   </div>
+   <div id=sidebar>
+    <p>Side Bar</p>
+    <p>Side Bar</p>
+    <p>Side Bar</p>
+    <p>Side Bar</p>
+    <p>Side Bar</p>
+   </div>
   </div>
-  <div class=hbox><input class=flex></div>
+  <div id=in class="cbox hbox">
+   <div> [ mimcpher #chat ] </div>
+   <input class=flex>
+  </div>
  </div>
 </div>

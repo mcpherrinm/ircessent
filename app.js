@@ -19,17 +19,17 @@ sessions = {
   };
 
 function servechat(req, res) {
-   fs.readFile(__dirname + "/chat.html",
-    function(err, data) {
-     if(err) {
-      res.writeHead(500);
-      return res.end('Error');
-     }
-     res.writeHead(200); 
-     /* Todo: Render data into initial page for non-JS / static / backlog use */
-     /* Put listener onto IRC to start getting bits popped into the socket */
-     res.end(data);
-    });
+  fs.readFile(__dirname + "/chat.html",
+      function(err, data) {
+        if(err) {
+          res.writeHead(500);
+          return res.end('Error');
+        }
+        res.writeHead(200); 
+        /* Todo: Render data into initial page for non-JS / static / backlog use */
+        /* Put listener onto IRC to start getting bits popped into the socket */
+        res.end(data);
+      });
 }
 
 function handler(req, res) {
@@ -58,6 +58,22 @@ function handler(req, res) {
   }
 }
 
+function ircconnect(host) {
+ var client = new irc.Client(host, sessions['mimcpher']['nick']);
+ sessions['mimcpher']['irc'] = client;
+ console.log("connecting....");
+ client.addListener('message', function(from, to, message) {
+  line(sessions['mimcpher']['socket'], new Date(), from, message);
+ });
+ client.addListener('topic', function (channel, topic, nick) { socket.emit('topicchange', topic); });
+ client.addListener('raw', function(message) {
+  console.log(message);
+ });
+ return client;
+}
+
+
+  ircconnect('irc.freenode.net');
 
 // Format a message for user display
 function line(sock, date, source, message) {
@@ -94,16 +110,6 @@ io.sockets.on('connection', function(socket) {
        if(topic != "") {
          socket.emit('topicchange', topic);
        }
-       break;
-     case "connect":
-       var host = 'irc.freenode.net';
-       var client = new irc.Client(host, sessions[user]['nick']);
-       sessions[user]['irc'] = client;
-       console.log("connecting....");
-       client.addListener('message', function(from, to, message) {
-         line(sessions[user]['socket'], new Date(), from, message);
-       });
-       client.addListener('topic', function (channel, topic, nick) { socket.emit('topicchange', topic); });
        break;
      case "join":
        var channel = "#herptest";

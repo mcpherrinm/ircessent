@@ -1,15 +1,37 @@
 .box {
+ display: box;
  display: -moz-box;
+ display: -webkit-box;
 
+ box-orient: vertical;
  -moz-box-orient: vertical;
+ -webkit-box-orient: vertical;
 }
 
 .hbox {
+ display: box;
  display: -moz-box;
+ display: -webkit-box;
 
+ box-orient: horizontal;
  -moz-box-orient: horizontal;
+ -webkit-box-orient: horizontal;
+}
+
+.cbox {
+ box-align: center;
+ -moz-box-align: center;
+ -webkit-box-align: center;
 }
 
 .flex {
+ box-flex: 1;
  -moz-box-flex: 1;
+ -webkit-box-flex: 1;
+}
+
+.endpack {
+ box-pack: end;
+ -moz-box-pack: end;
+ -webkit-box-pack: end;
 }
