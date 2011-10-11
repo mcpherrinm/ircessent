@@ -93,7 +93,7 @@ io.sockets.on('connection', function(socket) {
  });
  socket.on('message', function(data) {
    line(socket, new Date(), sessions[user]['nick'], data);
-   var channel = "#herptest";
+   var channel = "#ircessent";
    sessions[user]['irc'].say(channel, data);
  });
  socket.on('command', function(data) {
