@@ -33,7 +33,7 @@ function handler(req, res) {
   if(ticket) {
     cas.validate(ticket, function(err, status, username) {
       console.log("setting cookie for " + username);
-      if(status) {
+      if(!status) {
         res.writeHead(403); res.end("fuckoff"); 
       } else {
         var cookies = new Cookies(req, res);

@@ -12,20 +12,20 @@ exports['setup'] = function(sessions) {
   var client = new irc.Client(host, nick);
   console.log("connecting....");
   client.addListener('message', function(from, to, message) {
-   line(sessions['mimcpher']['socket'], new Date(), from, message);
+   line(sessions[user]['socket'], new Date(), from, message);
   });
-  client.addListener('topic', function (channel, topic, nick) { sessions['mimcpher']['socket'].emit('topicchange', topic); });
+  client.addListener('topic', function (channel, topic, nick) { sessions[user]['socket'].emit('topicchange', topic); });
   client.addListener('raw', function(message) {
    //console.log(message);
   });
   return client;
  }
- sessions[user]['irc'] = ircconnect('irc.freenode.net', sessions['mimcpher']['nick']);
+ sessions[user]['irc'] = ircconnect('irc.freenode.net', sessions[user]['nick']);
  return {
   message: function(data) {
    line(sessions[user]['socket'], new Date(), sessions[user]['nick'], data);
    var channel = "#ircessent";
-   sessions['mimcpher']['irc'].say(channel, data);
+   sessions[user]['irc'].say(channel, data);
   },
   command: function(data) {
    split = data.match(/^\/(\w+)(.*)/);
@@ -34,23 +34,23 @@ exports['setup'] = function(sessions) {
    switch(command) {
      case "nick":
        sessions[user]['nick'] = split[2].match(/\w+/)[0];
-       socket.emit('nickchange', sessions[user]['nick']);
+       sessions[user]['socket'].emit('nickchange', sessions[user]['nick']);
        break;
      case "topic":
        var topic = split[2];
        if(topic != "") {
          sessions[user]['irc'].send('#ircessent', 'TOPIC', 'foo');
-         socket.emit('topicchange', topic);
+         sessions[user]['socket'].emit('topicchange', topic);
        }
        break;
      case "join":
        var channel = "#ircessent";
        sessions[user]['irc'].join(channel);
        console.log('Joining ' + channel);
-       line(sessions['mimcpher']['socket'], new Date(), channel, "Joining...");
+       line(sessions[user]['socket'], new Date(), channel, "Joining...");
        break;
      default:
-       socket.emit('error', {'invalidCommand': command});
+       sessions[user]['emit'].emit('error', {'invalidCommand': command});
    }
   }
  }

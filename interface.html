@@ -2,6 +2,7 @@
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/client.js"></script>
 
 <style>
 html, body, body > div { height: 100%; width: 100%; }
@@ -28,7 +29,7 @@ overflow-y: scroll;
  <div id=content class="flex box">
   <div id=topic>{{ topic }}</div>
   <div class="hbox flex">
-   <div class="box flex endpack">
+   <div id=chat class="box flex endpack">
     <p>Content</p>
     <p>Content</p>
     <p>Content</p>
