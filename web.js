@@ -37,7 +37,7 @@ function handler(req, res) {
         res.writeHead(403); res.end("fuckoff"); 
       } else {
         var cookies = new Cookies(req, res);
-        cookies.set('ticket', ticket);
+        cookies.set('user', username);
         servestatic('/interface.html', res);
       }
     });
