@@ -1,8 +1,8 @@
 var Cookies = require('cookies')
 
-
-exports.setup = function(sessions, ircapp, webapp) {
-  var io = require('socket.io').listen(webapp);
+exports.app = require('socket.io');
+exports.setup = function(sessions) {
+  io = exports.app;
 
   io.configure(function () {
     io.set('authorization', function(handshakedata, callback) {
@@ -25,7 +25,7 @@ exports.setup = function(sessions, ircapp, webapp) {
     var user = socket.handshake.user;
     console.log('sock connect from ' + user);
     sessions[user]['socket'] = socket;
-    socket.on('message', ircapp.message);
-    socket.on('command', ircapp.command);
+    socket.on('message', sessions[user]['irc'].message);
+    socket.on('command', sessions[user]['irc'].command);
   });
 }

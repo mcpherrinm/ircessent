@@ -1,15 +1,14 @@
 var irc = require('irc')
-  , ent = require('ent');
+  , ent = require('ent')
 
 function line(sock, date, source, message) {
   sock.emit('message', ent.encode( date.toLocaleTimeString() + " <" + source + "> " + message));
 }
 
 
-exports['setup'] = function(sessions) {
- user = 'mimcpher';
+exports['setup'] = function(user, sessions) {
  function ircconnect(host, nick) {
-  var client = new irc.Client(host, nick);
+  var client = new irc.Client(host, nick, {autoconnect: false});
   console.log("connecting....");
   client.addListener('message', function(from, to, message) {
    line(sessions[user]['socket'], new Date(), from, message);
@@ -31,8 +30,8 @@ exports['setup'] = function(sessions) {
    sessions[user]['irc'].say(channel, data);
   },
   command: function(data) {
-   split = data.match(/^\/(\w+)\s*(.*)/);
-   command = split[1]; //safety: \w+ from regex
+   split = data.match(/^\/(\S+)\s*(.*)/);
+   command = split[1];
    // 0 is whole thing, 1 is command, 2 is remainder
    switch(command) {
      case "nick":
