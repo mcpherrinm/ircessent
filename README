@@ -1,7 +1,12 @@
 IRCessent
+----------
 
 An IRC client & bouncer.
 
-Persistent web-based IRC. Stay connected even when your browser is closed. Never miss another ping.
+Persistent web-based IRC. Stay connected even when your browser is closed.
+Never miss another ping.
 
 IRC channel is #ircessent on freenode.
+
+This software is available under the terms of the AGPLv3, or under another
+license with written permission of the author. See LICENSE.
