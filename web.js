@@ -1,17 +1,17 @@
 /* vim:set ts=2 sw=2 sts=2 et */
-var fs = require('fs')
- , CAS = require('cas')
- , Cookies = require('cookies')
+var fs = require('fs');
+var CAS = require('cas');
+var Cookies = require('cookies');
 
 var srv = require('http').createServer(handler);
 
-srv.listen(9000);
+srv.listen(process.env.PORT);
 
 exports.app = srv;
 
-var addr = exports.app.address()
+var addr = exports.app.address();
 
-var pageurl = 'http://' + addr.address + ':' + addr.port + '/'
+var pageurl = 'http://' + addr.address + ':' + addr.port + '/';
 
 cas = new CAS({base_url: 'https://cas.uwaterloo.ca/cas', service: pageurl});
 
@@ -30,11 +30,11 @@ function servestatic(file, res) {
 function handler(req, res) {
   console.log(req.url);
   var parsed = require('url').parse(req.url, true);
-  var file = parsed['pathname'];
+  var file = parsed.pathname;
   if(file != "/") { // allow other resources without auth
     return servestatic(file, res);
   }
-  var ticket = parsed['query']['ticket'];
+  var ticket = parsed.query.ticket;
   if(ticket) {
     cas.validate(ticket, function(err, status, username) {
       if(!status) {

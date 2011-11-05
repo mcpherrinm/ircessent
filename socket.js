@@ -1,4 +1,4 @@
-var Cookies = require('cookies')
+var Cookies = require('cookies');
 
 exports.app = require('socket.io');
 exports.setup = function(sessions) {
@@ -24,8 +24,8 @@ exports.setup = function(sessions) {
     console.log('connecting ' + JSON.stringify(socket.handshake));
     var user = socket.handshake.user;
     console.log('sock connect from ' + user);
-    sessions[user]['socket'] = socket;
-    socket.on('message', sessions[user]['irc'].message);
-    socket.on('command', sessions[user]['irc'].command);
+    sessions[user].socket = socket;
+    socket.on('message', sessions[user].irc.message);
+    socket.on('command', sessions[user].irc.command);
   });
-}
+};
